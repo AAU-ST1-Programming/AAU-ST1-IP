@@ -1,16 +1,17 @@
-from io import BytesIO
 from pathlib import Path
+from textwrap import wrap
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.graph_objects as go
 
 BASE_DIR = Path(__file__).resolve().parent
 CSV_PATH = BASE_DIR / "shared_overview.csv"
 HTML_PATH_TEMPLATE = "shared_overview_table{table_name}.html"
 PNG_PATH_TEMPLATE = "shared_overview_table{table_name}.png"
+COLUMN_WIDTHS = [40, 130, 110, 420]
+ROW_LINE_HEIGHT = 24
+# rough chars-per-line for the widest column, used only to size rows tall enough
+LAST_COLUMN_CHARS_PER_LINE = 65
 
 
 def build_df() -> pd.DataFrame:
@@ -24,8 +25,8 @@ def build_html(df: pd.DataFrame) -> dict[int, str]:
             df.style.set_uuid("shared_overview")
             .apply(
                 lambda row: (
-                    ["font-weight: 1000"] * len(row)
-                    if row["#"] == i
+                    ["font-weight: 1000; background-color: #e8f1f5"] * len(row)
+                    if str(row["#"]) == str(i)
                     else [""] * len(row)
                 ),
                 axis=1,
@@ -45,37 +46,44 @@ def png_path_from_template(table_name: str) -> Path:
 
 
 def build_png(df: pd.DataFrame, highlighted_row: int) -> bytes:
-    figure, axis = plt.subplots(figsize=(14, 1.35), dpi=180)
-    axis.axis("off")
-    table = axis.table(
-        cellText=df.astype(str).values.tolist(),
-        colLabels=list(df.columns),
-        colWidths=[0.06, 0.18, 0.16, 0.60],
-        cellLoc="left",
-        loc="center",
+    is_highlighted = (df["#"].astype(str) == str(highlighted_row)).to_numpy()
+    row_fill = ["#e8f1f5" if flag else "white" for flag in is_highlighted]
+
+    topics_column = df.columns[-1]
+    line_counts = [
+        max(1, len(wrap(str(value), width=LAST_COLUMN_CHARS_PER_LINE)))
+        for value in df[topics_column]
+    ]
+    header_height = 28
+
+    figure = go.Figure(
+        data=[
+            go.Table(
+                columnwidth=COLUMN_WIDTHS,
+                header=dict(
+                    values=list(df.columns),
+                    fill_color="#263238",
+                    font=dict(color="white", size=12, weight=700),
+                    align="left",
+                    height=header_height,
+                ),
+                cells=dict(
+                    values=[df[col] for col in df.columns],
+                    fill_color=[row_fill],
+                    font=dict(color="black", size=11),
+                    align="left",
+                    height=ROW_LINE_HEIGHT,
+                ),
+            )
+        ]
     )
-    table.auto_set_font_size(False)
-    table.set_fontsize(9)
-    table.scale(1, 1.8)
 
-    for column in range(len(df.columns)):
-        header = table[0, column]
-        header.set_facecolor("#263238")
-        header.set_text_props(color="white", weight="bold")
-
-    for row in range(1, len(df) + 1):
-        for column in range(len(df.columns)):
-            cell = table[row, column]
-            is_highlighted = df.iloc[row - 1]["#"] == highlighted_row
-            cell.set_facecolor("#e8f1f5" if is_highlighted else "white")
-            if is_highlighted:
-                cell.set_text_props(weight="bold")
-            cell.set_edgecolor("#b0bec5")
-
-    output = BytesIO()
-    figure.savefig(output, format="png", bbox_inches="tight", pad_inches=0.08)
-    plt.close(figure)
-    return output.getvalue()
+    figure.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        width=sum(COLUMN_WIDTHS) + 40,
+        height=ROW_LINE_HEIGHT * (sum(line_counts) - 1),
+    )
+    return figure.to_image(format="png", scale=2)
 
 
 def write_if_changed(output_path: Path, content: str | bytes) -> bool:
