@@ -6,8 +6,8 @@ import plotly.graph_objects as go
 
 BASE_DIR = Path(__file__).resolve().parent
 CSV_PATH = BASE_DIR / "shared_overview.csv"
-HTML_PATH_TEMPLATE = "shared_overview_table{table_name}.html"
-PNG_PATH_TEMPLATE = "shared_overview_table{table_name}.png"
+HTML_PATH_TEMPLATE = "shared_overview_table{table_number}.html"
+PNG_PATH_TEMPLATE = "shared_overview_table{table_number}.png"
 COLUMN_WIDTHS = [40, 130, 110, 420]
 ROW_LINE_HEIGHT = 24
 # rough chars-per-line for the widest column, used only to size rows tall enough
@@ -20,7 +20,7 @@ def build_df() -> pd.DataFrame:
 
 def build_html(df: pd.DataFrame) -> dict[int, str]:
     html_by_index: dict[int, str] = {}
-    for i in range(1, len(df) + 1):
+    for i in range(0, len(df) + 1):
         styled = (
             df.style.set_uuid("shared_overview")
             .apply(
@@ -37,15 +37,15 @@ def build_html(df: pd.DataFrame) -> dict[int, str]:
     return html_by_index
 
 
-def path_from_template(table_name: str) -> Path:
-    return BASE_DIR / HTML_PATH_TEMPLATE.format(table_name=table_name)
+def path_from_template(table_number: str) -> Path:
+    return BASE_DIR / HTML_PATH_TEMPLATE.format(table_number=table_number)
 
 
-def png_path_from_template(table_name: str) -> Path:
-    return BASE_DIR / PNG_PATH_TEMPLATE.format(table_name=table_name)
+def png_path_from_template(table_number: str) -> Path:
+    return BASE_DIR / PNG_PATH_TEMPLATE.format(table_number=table_number)
 
 
-def build_png(df: pd.DataFrame, highlighted_row: int) -> bytes:
+def build_png(df: pd.DataFrame, highlighted_row: int = -1) -> bytes:
     is_highlighted = (df["#"].astype(str) == str(highlighted_row)).to_numpy()
     row_fill = ["#e8f1f5" if flag else "white" for flag in is_highlighted]
 
@@ -106,25 +106,8 @@ def write_if_changed(output_path: Path, content: str | bytes) -> bool:
 
 def main() -> None:
     df = build_df()
-    html_by_index = build_html(df)
-
-    for i, html_content in html_by_index.items():
-        table_name = str(i)
-        html_path = path_from_template(table_name)
-        changed = write_if_changed(html_path, html_content)
-
-        if changed:
-            print(f"Updated {html_path}")
-        else:
-            print(f"No changes in {html_path}")
-
-        png_path = png_path_from_template(table_name)
-        changed = write_if_changed(png_path, build_png(df, i))
-
-        if changed:
-            print(f"Updated {png_path}")
-        else:
-            print(f"No changes in {png_path}")
+    png_path = png_path_from_template("")
+    changed = write_if_changed(png_path, build_png(df, -1))
 
 
 if __name__ == "__main__":

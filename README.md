@@ -1,6 +1,6 @@
 # Forord
 
-![overview_files/shared_overview_table1.png](overview_files/shared_overview_table1.png)
+![overview_files/shared_overview_table1.png](overview_files/shared_overview_table.png)
 
 Du kan få alle lectures i dette kursus ved at køre følgende linje i din terminal:
 
