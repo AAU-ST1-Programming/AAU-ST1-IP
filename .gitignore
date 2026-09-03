@@ -1,0 +1,5 @@
+*-checkpoint.*
+*.pyc
+uv.lock
+pyproject.toml
+.nbstripout

@@ -1,0 +1,10 @@
+#|Lecture|Folder|Primary topics
+1|Introduction|introduction| Introduktion i hvad Programmering er, C Programmring, og jeres første program.
+2|Setup|setup|Setup af C compiler, IDE, og ESP32
+3|Iterative Kontrolstrukturer|iterative_controlstructures|Hvordan tæller man?
+4|Selective Kontrol Strukturer|selective_kontrolstrukturer|Selektive kontrol mekanismer, som gør giver varierende funktionalitet
+5|Simple Datatyper|simple_datatypes|Hvordan arbejder man med simple datatyper/variabler
+6|Arrays and Pointers|arrays_and_pointers|Hvordan arbejder vi med meget data (billeder, signaler, bøger, osv.)?
+7|Advanced Datatypes|advanced_datatypes|Hvordan håndteres komplex data (fx person information kunne indeholde: navn, alder, addresse, tlf)
+8|Functions|functions|Hvordan genbruges kode?
+9+10|Workshop 1 & 2|MOODLE|Workshop 1+2, Hvordan kan værktøjerne fra dette kursus løse reelle problemer? (Lad op optage fysiologiske signaler med ESP32!)

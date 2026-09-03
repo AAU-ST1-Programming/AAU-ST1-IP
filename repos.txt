@@ -1,0 +1,9 @@
+https://github.com/AAU-ST1-Programming/introduktion.git
+https://github.com/AAU-ST1-Programming/setup.git
+https://github.com/AAU-ST1-Programming/iterative_controlstructures.git
+https://github.com/AAU-ST1-Programming/selective_kontrolstrukturer.git
+https://github.com/AAU-ST1-Programming/simple_datatypes.git
+https://github.com/AAU-ST1-Programming/arrays_and_pointers.git
+https://github.com/AAU-ST1-Programming/advanced_datatypes.git
+https://github.com/AAU-ST1-Programming/functions.git
+https://github.com/AAU-ST1-Programming/Recap_and_notes.git
