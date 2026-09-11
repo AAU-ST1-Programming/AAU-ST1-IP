@@ -3,3 +3,4 @@
 uv.lock
 pyproject.toml
 .nbstripout
+.python-version
